@@ -8,9 +8,10 @@ template <typename T>
 class Node {
 protected:
     Node<T> *next, *down;
+    T data;
 
 public:
-    explicit Node();
+    explicit Node(): next{nullptr}, down{nullptr} {}
 
     friend class Matrix<T>;
 };

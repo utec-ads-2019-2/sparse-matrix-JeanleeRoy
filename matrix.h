@@ -2,6 +2,8 @@
 #define SPARSE_MATRIX_MATRIX_H
 
 #include <stdexcept>
+#include <iostream>
+#include "node.h"
 
 using namespace std;
 
@@ -12,7 +14,10 @@ private:
     unsigned rows, columns;
 
 public:
-    Matrix(unsigned rows, unsigned columns);
+    Matrix(unsigned rows, unsigned columns) : rows{rows}, columns{columns} {
+        Node<T> *temp = root;
+        temp->next = new Node<T>;
+    }
 
     void set(unsigned, unsigned, T);
     T operator()(unsigned, unsigned) const;
@@ -21,9 +26,13 @@ public:
     Matrix<T> operator+(Matrix<T> other) const;
     Matrix<T> operator-(Matrix<T> other) const;
     Matrix<T> transpose() const;
-    void print() const;
+    void print() const {
+        Node<T> *temp = root;
+        if (temp->next)
+            cout << "Yes\n";
+    }
 
-    ~Matrix();
+    //~Matrix();
 };
 
 #endif //SPARSE_MATRIX_MATRIX_H
