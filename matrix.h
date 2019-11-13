@@ -14,27 +14,27 @@ private:
     unsigned rows, columns;
     vector<Node<T>*> Row, Column;
 
-    void killRow(Node<T> *&ptr) {
+    void killRow(Node<T> *ptr) {
         if (ptr->next) killRow(ptr->next);
         delete ptr;
     }
 
-    void buildHeaders(unsigned rows, unsigned columns) {
+    void buildHeaders() {
         for (size_t i = 0; i < rows; ++i)
-            Row.push_back(new Node<int>(i));
+            Row.push_back(new Node<int>());
         for (size_t i = 0; i < columns; ++i)
-            Column.push_back(new Node<int>(i));
+            Column.push_back(new Node<int>());
     }
 
 public:
     Matrix(unsigned rows, unsigned columns) : rows{rows}, columns{columns} {
-        buildHeaders(rows,columns);
+        buildHeaders();
     }
 
-    /*Matrix (const Matrix &mx) : rows{mx.rows}, columns{mx.columns} {
-        buildHeaders(rows,columns);
+    /*Matrix(const Matrix &mx) : rows{mx.rows}, columns{mx.columns} {
+        buildHeaders();
         for (int i = 0; i < rows; ++i) {
-            Node<T> *temp = Row[i];
+            Node<T> *temp = mx.Row[i];
             while (temp->next) {
                 temp = temp->next;
                 this->set(temp->x, temp->y, temp->data);
@@ -43,7 +43,8 @@ public:
     }*/
 
     void set(unsigned x, unsigned y, T data) {
-        if (x < 0 || y < 0 || x >= columns || y >= rows)
+        //if (x < 0 || y < 0 || x >= columns || y >= rows)
+        if (!(x >= 0 && x < rows && y >= 0 && y < columns))
             throw out_of_range("Out of range");
 
         Node<T> *temp_x = Row[x], *temp_y = Column[y];
@@ -71,7 +72,7 @@ public:
         }
     }
     T operator()(unsigned x, unsigned y) const {
-        if (x < y) {
+        if (x > y) {
             Node<T>* temp = Row[x];
             while (temp->next && temp->next->y < y)
                 temp = temp->next;
@@ -136,6 +137,16 @@ public:
         }
         return Mtx;
     }
+    /*Matrix& operator=(const Matrix &that) {
+        for (int i = 0; i < that.rows; ++i) {
+            Node<T> *temp = that.Row[i];
+            while (temp->next) {
+                temp = temp->next;
+                set(temp->x, temp->y, temp->data);
+            }
+        }
+        return (*this);
+    }*/
     Matrix<T> transpose() const {
         Matrix<T> Mtx(columns,rows);
         for (int i = 0; i < rows; ++i)
@@ -157,15 +168,11 @@ public:
     }
 
     /*~Matrix() {
-        for (auto C : Column) {
-            //cout << "Head " << C->data << " deleted\n";
-            delete C;
-        }
-        for (auto R : Row) {
-            //cout << "Row " << R->data << " deleted \n";
-            killRow(R->next);
-            delete R;
-        }
+        for (auto c : Column)
+            delete c;
+        for (auto x : Row)
+            killRow(x);
+        cout << "Destroyed\n";
     }*/
 };
 
