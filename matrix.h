@@ -11,57 +11,63 @@ using namespace std;
 template <typename T>
 class Matrix {
 private:
-    //Node<T> *root;
     unsigned rows, columns;
     vector<Node<T>*> Row, Column;
 
-public:
-    Matrix(unsigned rows, unsigned columns) : rows{rows}, columns{columns} {
+    void killRow(Node<T> *&ptr) {
+        if (ptr->next) killRow(ptr->next);
+        delete ptr;
+    }
+
+    void buildHeaders(unsigned rows, unsigned columns) {
         for (size_t i = 0; i < rows; ++i)
             Row.push_back(new Node<int>(i));
         for (size_t i = 0; i < columns; ++i)
             Column.push_back(new Node<int>(i));
     }
 
+public:
+    Matrix(unsigned rows, unsigned columns) : rows{rows}, columns{columns} {
+        buildHeaders(rows,columns);
+    }
+
+    /*Matrix (const Matrix &mx) : rows{mx.rows}, columns{mx.columns} {
+        buildHeaders(rows,columns);
+        for (int i = 0; i < rows; ++i) {
+            Node<T> *temp = Row[i];
+            while (temp->next) {
+                temp = temp->next;
+                this->set(temp->x, temp->y, temp->data);
+            }
+        }
+    }*/
+
     void set(unsigned x, unsigned y, T data) {
         if (x < 0 || y < 0 || x >= columns || y >= rows)
             throw out_of_range("Out of range");
 
-        Node<T> *temp = Row[x];
-        while (temp->next && temp->next->y < y)
-            temp = temp->next;
-        if (temp->next && temp->next->y == y) {
-            if (data != 0) {
-                cout << "\nUpdated position (" <<x<<","<<y<<"): " << temp->next->data <<"-->"<<data<<"\n\n";
-                temp->next->data = data;
-                return;
-            } else {
-                auto aux = temp->next;
-                temp->next = aux->next;
-            }
+        Node<T> *temp_x = Row[x], *temp_y = Column[y];
+        while (temp_x->next && temp_x->next->y < y)
+            temp_x = temp_x->next;
+        while (temp_y->down && temp_y->down->x < x)
+            temp_y = temp_y->down;
+
+        if (temp_x->next && temp_x->next->y == y) {
+            if (data != 0)
+                temp_x->next->data = data;
+            else {
+                temp_x->next = temp_x->next->next;
+                auto aux = temp_y->down;
+                temp_y->down = aux->down;
+                delete aux;
+            } return;
         }
         if (data != 0) {
-            auto to_set = new Node<T>(data,x,y);
-            to_set->next = temp->next;
-            temp->next = to_set;
-            cout << "SETx ";
-            temp = Column[y];
-            while (temp->down && temp->down->x < x)
-                temp = temp->down;
-            to_set->down = temp->down;
-            temp->down = to_set;
-            cout << "SETy\n";
-        } else {
-            temp = Column[y];
-            while (temp->down && temp->down->x < x)
-                temp = temp->down;
-            if (temp->down && temp->down->x == x) {
-                auto aux = temp->down;
-                temp->down = aux->down;
-                delete aux;
-                cout << "\nTo Delete position (" <<x<<","<<y<<")\n\n";
-                return;
-            }
+            auto set = new Node<T>(data,x,y);
+            set->next = temp_x->next;
+            temp_x->next = set;
+            set->down = temp_y->down;
+            temp_y->down = set;
         }
     }
     T operator()(unsigned x, unsigned y) const {
@@ -138,34 +144,29 @@ public:
         return Mtx;
     }
     void print() const {
-        cout << "\t\t";
-        for (auto i : Column)
-            cout << i->data << "\t\t";
-        cout << endl;
         for (int i = 0; i < rows; ++i) {
-            auto temp = Row[i];
-            cout << temp->data << "\t\t";
-            temp = temp->next;
-            while (temp) {
-                cout << temp->data << "(" << temp->x << "," << temp->y << ")\t\t";
-                temp = temp->next;
-            }
-            cout << endl;
-        }
+            auto temp = Row[i]->next;
+            for (int j = 0; j < columns; ++j) {
+                if (temp && temp->y == j) {
+                    cout << temp->data << "\t\t";
+                    temp = temp->next;
+                } else
+                    cout << 0 << "\t\t";
+            } cout << endl;
+        } cout << endl;
     }
 
-    void print_x(unsigned col) const {
-        cout << endl;
-        auto temp = Column[col];
-        cout << temp->data << endl;
-        temp = temp->down;
-        while (temp) {
-            cout << temp->data << "(" << temp->x << "," << temp->y << ")\n";
-            temp = temp->down;
+    /*~Matrix() {
+        for (auto C : Column) {
+            //cout << "Head " << C->data << " deleted\n";
+            delete C;
         }
-    }
-
-    //~Matrix();
+        for (auto R : Row) {
+            //cout << "Row " << R->data << " deleted \n";
+            killRow(R->next);
+            delete R;
+        }
+    }*/
 };
 
 #endif //SPARSE_MATRIX_MATRIX_H
