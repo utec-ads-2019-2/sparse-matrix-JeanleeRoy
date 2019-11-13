@@ -19,6 +19,9 @@ int main() {
     auto M3 = M2-M;
     M3.print();
     M3.print_x(1);
+    auto M4 = M3.transpose();
+    M4.print();
+    M4.print_x(0);
 //    cout << endl << M(1,0) << endl;
     return EXIT_SUCCESS;
 }

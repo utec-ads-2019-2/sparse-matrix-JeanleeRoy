@@ -131,7 +131,11 @@ public:
         return Mtx;
     }
     Matrix<T> transpose() const {
-
+        Matrix<T> Mtx(columns,rows);
+        for (int i = 0; i < rows; ++i)
+            for (int j = 0; j < columns; ++j)
+                Mtx.set(j,i,this->operator()(i,j));
+        return Mtx;
     }
     void print() const {
         cout << "\t\t";
