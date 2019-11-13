@@ -18,7 +18,6 @@ private:
         if (ptr->next) killRow(ptr->next);
         delete ptr;
     }
-
     void buildHeaders() {
         for (size_t i = 0; i < rows; ++i)
             Row.push_back(new Node<int>());
@@ -31,16 +30,12 @@ public:
         buildHeaders();
     }
 
-    /*Matrix(const Matrix &mx) : rows{mx.rows}, columns{mx.columns} {
+    Matrix(const Matrix &mx) : rows{mx.rows}, columns{mx.columns} {
         buildHeaders();
-        for (int i = 0; i < rows; ++i) {
-            Node<T> *temp = mx.Row[i];
-            while (temp->next) {
-                temp = temp->next;
-                this->set(temp->x, temp->y, temp->data);
-            }
-        }
-    }*/
+        for (int i = 0; i < rows; ++i)
+            for (int j = 0; j < columns; ++j)
+                set(i,j,mx.operator()(i,j));
+    }
 
     void set(unsigned x, unsigned y, T data) {
         //if (x < 0 || y < 0 || x >= columns || y >= rows)
@@ -71,6 +66,7 @@ public:
             temp_y->down = set;
         }
     }
+
     T operator()(unsigned x, unsigned y) const {
         if (x > y) {
             Node<T>* temp = Row[x];
@@ -88,6 +84,7 @@ public:
             return 0;
         }
     }
+
     Matrix<T> operator*(T scalar) const {
         Matrix<T> Scalar(rows,columns);
         for (int i = 0; i < rows; ++i) {
@@ -99,6 +96,7 @@ public:
         }
         return Scalar;
     }
+
     Matrix<T> operator*(Matrix<T> other) const {
         if (columns != other.rows)
             throw out_of_range("Rows/Columns error");
@@ -113,6 +111,7 @@ public:
         }
         return Mtx;
     }
+
     Matrix<T> operator+(Matrix<T> other) const {
         if (rows != other.rows || columns != other.columns)
             throw out_of_range("Rows/Columns error");
@@ -125,6 +124,7 @@ public:
         }
         return Mtx;
     }
+
     Matrix<T> operator-(Matrix<T> other) const {
         if (rows != other.rows || columns != other.columns)
             throw out_of_range("Rows/Columns error");
@@ -137,16 +137,14 @@ public:
         }
         return Mtx;
     }
-    /*Matrix& operator=(const Matrix &that) {
-        for (int i = 0; i < that.rows; ++i) {
-            Node<T> *temp = that.Row[i];
-            while (temp->next) {
-                temp = temp->next;
-                set(temp->x, temp->y, temp->data);
-            }
-        }
+
+    Matrix& operator=(const Matrix &that) {
+        for (int i = 0; i < that.rows; ++i)
+            for (int j = 0; j < that.columns; ++j)
+                set(i,j,that.operator()(i,j));
         return (*this);
-    }*/
+    }
+
     Matrix<T> transpose() const {
         Matrix<T> Mtx(columns,rows);
         for (int i = 0; i < rows; ++i)
@@ -154,6 +152,7 @@ public:
                 Mtx.set(j,i,this->operator()(i,j));
         return Mtx;
     }
+
     void print() const {
         for (int i = 0; i < rows; ++i) {
             auto temp = Row[i]->next;
@@ -167,13 +166,12 @@ public:
         } cout << endl;
     }
 
-    /*~Matrix() {
-        for (auto c : Column)
-            delete c;
+    ~Matrix() {
+        for (auto y : Column)
+            delete y;
         for (auto x : Row)
             killRow(x);
-        cout << "Destroyed\n";
-    }*/
+    }
 };
 
 #endif //SPARSE_MATRIX_MATRIX_H
