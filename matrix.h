@@ -71,27 +71,64 @@ public:
                 temp = temp->next;
             if (temp->next && temp->next->y == y)
                 return temp->next->data;
-            throw invalid_argument("Node not found");
+            return 0;
         } else {
             Node<T>* temp = Column[y];
             while (temp->down && temp->down->x < x)
                 temp = temp->down;
             if (temp->down && temp->down->x == x)
                 return temp->down->data;
-            throw invalid_argument("Node not found");
+            return 0;
         }
     }
     Matrix<T> operator*(T scalar) const {
-
+        Matrix<T> Scalar(rows,columns);
+        for (int i = 0; i < rows; ++i) {
+            Node<T> *temp = Row[i];
+            while (temp->next) {
+                temp = temp->next;
+                Scalar.set(temp->x, temp->y, temp->data*scalar);
+            }
+        }
+        return Scalar;
     }
     Matrix<T> operator*(Matrix<T> other) const {
-
+        if (columns != other.rows)
+            throw out_of_range("Rows/Columns error");
+        Matrix<T> Mtx(rows,other.columns);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < other.columns; ++j) {
+                T sum = 0;
+                for (int k = 0; k < columns; ++k)
+                    sum += this->operator()(i,k)*other.operator()(k,j);
+                Mtx.set(i,j,sum);
+            }
+        }
+        return Mtx;
     }
     Matrix<T> operator+(Matrix<T> other) const {
-
+        if (rows != other.rows || columns != other.columns)
+            throw out_of_range("Rows/Columns error");
+        Matrix<T> Mtx(rows,columns);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                T sum =  this->operator()(i,j)+other.operator()(i,j);
+                Mtx.set(i,j,sum);
+            }
+        }
+        return Mtx;
     }
     Matrix<T> operator-(Matrix<T> other) const {
-
+        if (rows != other.rows || columns != other.columns)
+            throw out_of_range("Rows/Columns error");
+        Matrix<T> Mtx(rows,columns);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                T res =  this->operator()(i,j)-other.operator()(i,j);
+                Mtx.set(i,j,res);
+            }
+        }
+        return Mtx;
     }
     Matrix<T> transpose() const {
 
@@ -101,7 +138,7 @@ public:
         for (auto i : Column)
             cout << i->data << "\t\t";
         cout << endl;
-        for (int i = 0; i < columns; ++i) {
+        for (int i = 0; i < rows; ++i) {
             auto temp = Row[i];
             cout << temp->data << "\t\t";
             temp = temp->next;
