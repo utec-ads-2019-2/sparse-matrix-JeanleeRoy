@@ -64,8 +64,22 @@ public:
             }
         }
     }
-    T operator()(unsigned, unsigned) const {
-
+    T operator()(unsigned x, unsigned y) const {
+        if (x < y) {
+            Node<T>* temp = Row[x];
+            while (temp->next && temp->next->y < y)
+                temp = temp->next;
+            if (temp->next && temp->next->y == y)
+                return temp->next->data;
+            throw invalid_argument("Node not found");
+        } else {
+            Node<T>* temp = Column[y];
+            while (temp->down && temp->down->x < x)
+                temp = temp->down;
+            if (temp->down && temp->down->x == x)
+                return temp->down->data;
+            throw invalid_argument("Node not found");
+        }
     }
     Matrix<T> operator*(T scalar) const {
 
