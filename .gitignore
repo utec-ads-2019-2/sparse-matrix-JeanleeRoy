@@ -34,4 +34,5 @@
 # IDEs
 .idea/
 cmake-build-*/
+CMakeLists.txt
 .vscode/*

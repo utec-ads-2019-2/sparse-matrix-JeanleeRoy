@@ -3,8 +3,16 @@
 
 int main() {
     //Tester::execute();
+    cout << "Hello\n";
     Matrix<int> M(2,2);
     M.print();
+    M.set(1,1,11);
+    M.set(0,1,01);
+    M.print();
+    M.print_x(1);
+    M.set(1,1,0);
+    M.print();
+    M.print_x(1);
     return EXIT_SUCCESS;
 }
 
