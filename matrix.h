@@ -85,6 +85,8 @@ public:
         }
     }
 
+    // Tus operaciones serán más lentas si utilizas los métodos públicos en vez de los punteros directamente
+
     Matrix<T> operator*(T scalar) const {
         Matrix<T> Scalar(rows,columns);
         for (int i = 0; i < rows; ++i) {
